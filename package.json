@@ -1,7 +1,7 @@
 {
-  "name": "watermark-image",
+  "name": "watermark0-image",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/watermark.js",
   "scripts": {
     "start": "tsc -w",
     "build": "tsc",
@@ -13,9 +13,17 @@
   "license": "ISC",
   "devDependencies": {
     "prettier": "^1.18.2",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.5.3"
   },
   "dependencies": {},
-  "keywords": [],
-  "description": ""
+  "keywords": [
+    "watermark",
+    "watermarkImage",
+    "typescript",
+    "watermark",
+    ".d.ts watermark"
+  ],
+  "description": "add watermark in you image"
 }
