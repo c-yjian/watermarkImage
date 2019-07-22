@@ -41,9 +41,10 @@ class Watermark {
 
     draw = (dataURL: string, userOpts?: IUserOpts): void => {
         let { _draw, setOptions } = this
-        userOpts && setOptions(userOpts)
-        this.step = 0
-        this.img.src = dataURL
+        userOpts && setOptions(userOpts);
+        this.step = 0;
+        this.img.src = dataURL;
+        this.img.setAttribute("crossOrigin",'Anonymous');
         this.img.onload = () => {
             this.img_width = this.img.width
             const max = 2000

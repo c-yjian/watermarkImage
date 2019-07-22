@@ -261,7 +261,7 @@ class Canvas2Image {
     // generate img tag
     private genImage = (imgBase64StrData: string) => {
         const img: HTMLImageElement = document.createElement('img')
-        img.src = imgBase64StrData
+        img.src = imgBase64StrData;
         return img
     }
 
