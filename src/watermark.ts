@@ -8,17 +8,17 @@ interface IUserOpts {
     watermarkHeight: number
 }
 
-class Index {
+class Watermark {
     private img: HTMLImageElement = new Image()
     private step: number = 0
-    //水印的 canvas
+    // 水印的 canvas
     private waterCanvas: HTMLCanvasElement = document.createElement('canvas')
     private waterTextRotate: number = 20
     private img_width: number = 0
     private img_height: number = 0
     private userOptions: any = {}
     private watermarkCanvas: HTMLCanvasElement = document.createElement('canvas')
-    //整个画板
+    // 整个画板
     private canvas: HTMLCanvasElement
     private ctx: CanvasRenderingContext2D
 
@@ -28,6 +28,53 @@ class Index {
         this.ctx = canvas.getContext('2d')!
         ;(watermarkCanvas as any).width = '160px'
         ;(watermarkCanvas as any).height = '100px'
+    }
+    setOptions = (userOpts: Partial<IUserOpts>): void => {
+        const { img, createWatermarkCanvas, _draw } = this
+        this.userOptions = userOpts
+        createWatermarkCanvas()
+        if (!img) {
+            return
+        }
+        _draw()
+    }
+
+    draw = (dataURL: string, userOpts?: IUserOpts): void => {
+        let { _draw, setOptions } = this
+        userOpts && setOptions(userOpts)
+        this.step = 0
+        this.img.src = dataURL
+        this.img.onload = () => {
+            this.img_width = this.img.width
+            const max = 2000
+            if (this.img_width > max) {
+                this.img_width = max
+                this.img_height = (max * this.img.height) / this.img.width
+            } else {
+                this.img_height = this.img.height
+            }
+            _draw()
+        }
+    }
+
+    rotate = (): void => {
+        const { img, _draw } = this
+        if (!img) {
+            return
+        }
+        this.step >= 3 ? (this.step = 0) : this.step++
+        _draw()
+    }
+
+    save = (): void => {
+        const { img, canvas } = this
+        if (!img) {
+            return
+        }
+        new Canvas2Image(canvas).saveAsImage({
+            imageName: 'waterMark',
+            imageType: 'png',
+        })
     }
 
     private _draw = () => {
@@ -66,13 +113,13 @@ class Index {
         const wctx: CanvasRenderingContext2D = waterCanvas.getContext('2d')!
         waterCanvas.width = watermarkWidth
         waterCanvas.height = watermarkHeight
-        //水印样式设置
+        // 水印样式设置
         wctx.font = `${fontSize}px 黑体`
-        //文字倾斜角度
+        // 文字倾斜角度
         wctx.rotate((-waterTextRotate * Math.PI) / 180)
         wctx.fillStyle = fillStyle
         const { sin } = Math
-        //文字水印 canvas旋转之后，需要重新根据旋转的角度计算高度 y
+        // 文字水印 canvas旋转之后，需要重新根据旋转的角度计算高度 y
         const deltH = sin((waterTextRotate * Math.PI) / 180) * watermarkWidth
         wctx.fillText(text, 0, fontSize + deltH)
     }
@@ -116,57 +163,11 @@ class Index {
 
     private addWatermark = (): void => {
         const { ctx, waterCanvas, canvas } = this
-        //平铺--重复小块的canvas
+        // 平铺--重复小块的canvas
         const pat = ctx.createPattern(waterCanvas, 'repeat')
         ctx.fillStyle = pat!
         ctx.fillRect(0, 0, canvas.width, canvas.height)
     }
-
-    setOptions = (userOpts: Partial<IUserOpts>): void => {
-        const { img, createWatermarkCanvas, _draw } = this
-        this.userOptions = userOpts
-        createWatermarkCanvas()
-        if (!img) {
-            return
-        }
-        _draw()
-    }
-
-    draw = (dataURL: string, userOpts?: IUserOpts): void => {
-        let { _draw, setOptions } = this
-        userOpts && setOptions(userOpts)
-        this.step = 0
-        this.img.src = dataURL
-        this.img.onload = () => {
-            this.img_width = this.img.width
-            const max = 2000
-            if (this.img_width > max) {
-                this.img_width = max
-                this.img_height = (max * this.img.height) / this.img.width
-            } else {
-                this.img_height = this.img.height
-            }
-            _draw()
-        }
-    }
-
-    rotate = (): void => {
-        const { img, _draw } = this
-        if (!img) return
-        this.step >= 3 ? (this.step = 0) : this.step++
-        _draw()
-    }
-
-    save = (): void => {
-        const { img, canvas } = this
-        if (!img) {
-            return
-        }
-        new Canvas2Image(canvas).saveAsImage({
-            imageName: 'waterMark',
-            imageType: 'png',
-        })
-    }
 }
 
-export default Index
+export default Watermark
